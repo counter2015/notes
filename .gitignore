@@ -36,3 +36,5 @@ project/project/
 .bsp/
 .bloop/
 .metals/
+
+.tmp-check/

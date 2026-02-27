@@ -40,3 +40,4 @@ project/project/
 .tmp-check/
 hs_err_pid*.log
 replay_pid*.log
+.tmp-ref/

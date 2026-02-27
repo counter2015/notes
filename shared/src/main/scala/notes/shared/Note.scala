@@ -12,7 +12,7 @@ object NoteId:
   def unsafe(value: String): NoteId = NoteId(value)
 
 final case class NoteSnapshot(
-    id: String,
-    content: String,
-    version: Long
+  id: String,
+  content: String,
+  version: Long
 )

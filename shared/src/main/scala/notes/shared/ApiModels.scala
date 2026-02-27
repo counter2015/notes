@@ -1,29 +1,29 @@
 package notes.shared
 
 final case class SaveNoteForm(
-    t: String,
-    version: Long
+  t: String,
+  version: Long
 )
 
 final case class SaveNoteResponse(
-    id: String,
-    version: Long,
-    updatedAt: String
+  id: String,
+  version: Long,
+  updatedAt: String
 )
 
 final case class ApiErrorBody(
-    code: ApiErrorCode,
-    message: String,
-    requestId: String
+  code: ApiErrorCode,
+  message: String,
+  requestId: String
 )
 
 final case class ApiConflictCurrent(
-    version: Long
+  version: Long
 )
 
 final case class ApiErrorEnvelope(
-    error: ApiErrorBody,
-    current: Option[ApiConflictCurrent] = None
+  error: ApiErrorBody,
+  current: Option[ApiConflictCurrent] = None
 )
 
 enum ApiErrorCode(val code: String):

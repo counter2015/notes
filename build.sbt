@@ -5,6 +5,20 @@ import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 
 ThisBuild / scalaVersion := Versions.scala3
 ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+ThisBuild / scalacOptions ++= Seq(
+  "-feature",
+  "-deprecation",
+  "-encoding",
+  "utf-8",
+  "-explaintypes",
+  "-Wunused:all"
+)
+
+Global / onChangedBuildSource := ReloadOnSourceChanges
+scalafmtOnCompile := true
+scalafixOnCompile := false
 
 lazy val root = (project in file("."))
   .aggregate(sharedJVM, sharedJS, backend, frontend)

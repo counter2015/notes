@@ -6,7 +6,7 @@ trait IdAllocator:
   def allocate(): String
 
 final class RandomIdAllocator(
-    random: Random = new Random()
+  random: Random = new Random()
 ) extends IdAllocator:
   private val alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
   private val idLength = 4

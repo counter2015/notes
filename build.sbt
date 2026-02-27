@@ -3,9 +3,7 @@ import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbtcrossproject.CrossProject
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 
-val scala3Version = "3.8.2"
-
-ThisBuild / scalaVersion := scala3Version
+ThisBuild / scalaVersion := Versions.scala3
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
 lazy val root = (project in file("."))
@@ -20,10 +18,10 @@ lazy val shared: CrossProject = crossProject(JSPlatform, JVMPlatform)
   .in(file("shared"))
   .settings(
     name := "notes-shared",
-    libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core" % "0.14.15",
-      "io.circe" %%% "circe-generic" % "0.14.15"
-    )
+    libraryDependencies ++=
+      ModuleDependencies.sharedCross.map { dep =>
+        dep.organization %%% dep.artifact % dep.version
+      }
   )
 
 lazy val sharedJVM = shared.jvm
@@ -33,7 +31,12 @@ lazy val backend = (project in file("backend"))
   .dependsOn(sharedJVM)
   .settings(
     name := "notes-backend",
-    libraryDependencies += "org.scalameta" %% "munit" % "1.2.3" % Test
+    libraryDependencies ++=
+      ModuleDependencies.backendJvm.map { dep =>
+        dep.organization %% dep.artifact % dep.version
+      } :+
+        (Libraries.Logging.logbackClassic.organization % Libraries.Logging.logbackClassic.artifact % Libraries.Logging.logbackClassic.version) :+
+        (Libraries.Testing.munit.organization %% Libraries.Testing.munit.artifact % Libraries.Testing.munit.version % Test)
   )
 
 lazy val frontend = (project in file("frontend"))
@@ -42,5 +45,9 @@ lazy val frontend = (project in file("frontend"))
   .settings(
     name := "notes-frontend",
     scalaJSUseMainModuleInitializer := true,
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.2.3" % Test
+    libraryDependencies ++=
+      ModuleDependencies.frontendJs.map { dep =>
+        dep.organization %%% dep.artifact % dep.version
+      } :+
+        (Libraries.Testing.munit.organization %%% Libraries.Testing.munit.artifact % Libraries.Testing.munit.version % Test)
   )

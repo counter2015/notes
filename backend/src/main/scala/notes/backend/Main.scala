@@ -1,8 +1,15 @@
 package notes.backend
 
-import notes.shared.NoteSnapshot
+import notes.backend.api.Endpoints
+import notes.backend.service.RandomIdAllocator
+import sttp.tapir.server.netty.sync.NettySyncServer
 
 object Main:
   def main(args: Array[String]): Unit =
-    val demo = NoteSnapshot("ab12", "hello from backend", 0)
-    println(s"[backend] scaffold ready: ${demo.id}")
+    val idAllocator = new RandomIdAllocator()
+    val server = NettySyncServer()
+      .port(8080)
+      .host("0.0.0.0")
+      .addEndpoint(Endpoints.allocateNote(idAllocator))
+    println("[backend] starting server on http://0.0.0.0:8080")
+    server.startAndWait()

@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.coverage
+coverage.xml
+
+# Pythone env
+.env
+.venv/
+venv/
+
+# cache
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# editor/system
+.DS_Store
+.idea/
+.vscode/
+.ipynb_checkpoints/
+
+# Codex built-in skills
+skills/.system/
+
+# temporary files
+tmp/
+.tmp-g8/
+.tmp-g8-templates/
+
+# Scala / sbt
+target/
+project/target/
+project/project/
+.bsp/
+.bloop/
+.metals/

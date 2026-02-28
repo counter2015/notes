@@ -2,6 +2,7 @@ import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbtcrossproject.CrossProject
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
+import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
 
 ThisBuild / scalaVersion := Versions.scala3
 ThisBuild / version := "0.1.0-SNAPSHOT"
@@ -42,9 +43,11 @@ lazy val sharedJVM = shared.jvm
 lazy val sharedJS = shared.js
 
 lazy val backend = (project in file("backend"))
+  .enablePlugins(JavaAppPackaging)
   .dependsOn(sharedJVM)
   .settings(
     name := "notes-backend",
+    Compile / mainClass := Some("notes.backend.Main"),
     libraryDependencies ++=
       ModuleDependencies.backendJvmScala.map { dep =>
         dep.organization %% dep.artifact % dep.version

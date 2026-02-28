@@ -16,6 +16,18 @@ sbt backend/run
 sbt frontend/fastLinkJS
 ```
 
+## 后端打包（sbt-native-packager）
+
+生成可分发包（zip）：
+
+```bash
+sbt backend/Universal/packageBin
+```
+
+产物默认位置：
+
+- `backend/target/universal/notes-backend-0.1.0-SNAPSHOT.zip`
+
 ## PostgreSQL 初始化（幂等）
 
 后端默认配置位于 [application.conf](backend/src/main/resources/application.conf)，可通过环境变量覆盖。

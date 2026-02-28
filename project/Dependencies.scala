@@ -4,6 +4,7 @@ object Versions {
   val tapir = "1.13.9"
   val munit = "1.2.3"
   val logback = "1.5.32"
+  val postgresql = "42.7.10"
 }
 
 final case class DependencyCoordinate(
@@ -31,6 +32,10 @@ object Libraries {
   object Logging {
     val logbackClassic = DependencyCoordinate("ch.qos.logback", "logback-classic", Versions.logback)
   }
+
+  object Database {
+    val postgresql = DependencyCoordinate("org.postgresql", "postgresql", Versions.postgresql)
+  }
 }
 
 object ModuleDependencies {
@@ -39,10 +44,14 @@ object ModuleDependencies {
     Libraries.Circe.generic
   )
 
-  val backendJvm: Seq[DependencyCoordinate] = Seq(
+  val backendJvmScala: Seq[DependencyCoordinate] = Seq(
     Libraries.Tapir.core,
     Libraries.Tapir.jsonCirce,
     Libraries.Tapir.nettyServerSync
+  )
+
+  val backendJvmJava: Seq[DependencyCoordinate] = Seq(
+    Libraries.Database.postgresql
   )
 
   val frontendJs: Seq[DependencyCoordinate] = Seq.empty

@@ -42,17 +42,116 @@ object HtmlPageRenderer:
        |      border-color: #0969da;
        |      box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15);
        |    }
+       |    .status {
+       |      position: fixed;
+       |      right: 24px;
+       |      bottom: 20px;
+       |      padding: 6px 10px;
+       |      border-radius: 6px;
+       |      font-size: 12px;
+       |      color: #57606a;
+       |      background: rgba(255, 255, 255, 0.9);
+       |      border: 1px solid #d0d7de;
+       |    }
        |  </style>
        |</head>
        |<body>
        |  <main class="page">
        |    <textarea class="content">$escapedContent</textarea>
        |  </main>
+       |  <div class="status" id="save-status">Saved</div>
        |  <script>
        |    window.__NOTE__ = {
        |      id: "${snapshot.id}",
        |      version: ${snapshot.version}
        |    };
+       |
+       |    (function() {
+       |      const textarea = document.querySelector(".content");
+       |      const status = document.getElementById("save-status");
+       |      const noteId = window.__NOTE__.id;
+       |      let version = window.__NOTE__.version || 0;
+       |      let lastSavedContent = textarea.value;
+       |      let debounceTimer = null;
+       |      let saving = false;
+       |      let pendingDirty = false;
+       |      let conflict = false;
+       |
+       |      const setStatus = (text) => { status.textContent = text; };
+       |
+       |      const buildBody = () => {
+       |        const params = new URLSearchParams();
+       |        params.set("t", textarea.value);
+       |        params.set("version", String(version));
+       |        return params;
+       |      };
+       |
+       |      const saveNow = async (force) => {
+       |        if (conflict && !force) return;
+       |        if (!force && textarea.value === lastSavedContent) return;
+       |        if (saving) {
+       |          pendingDirty = true;
+       |          return;
+       |        }
+       |
+       |        saving = true;
+       |        setStatus("Saving...");
+       |        try {
+       |          const response = await fetch("/" + noteId, {
+       |            method: "POST",
+       |            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+       |            body: buildBody().toString(),
+       |            credentials: "same-origin",
+       |            keepalive: !!force
+       |          });
+       |
+       |          if (response.status === 200) {
+       |            const payload = await response.json();
+       |            version = payload.version;
+       |            lastSavedContent = textarea.value;
+       |            conflict = false;
+       |            setStatus("Saved");
+       |          } else if (response.status === 409) {
+       |            conflict = true;
+       |            setStatus("Conflict. Refresh required");
+       |          } else if (response.status === 413) {
+       |            setStatus("Content too large");
+       |          } else {
+       |            setStatus("Save failed");
+       |          }
+       |        } catch (_) {
+       |          setStatus("Save failed");
+       |        } finally {
+       |          saving = false;
+       |          if (pendingDirty && !conflict) {
+       |            pendingDirty = false;
+       |            void saveNow(false);
+       |          }
+       |        }
+       |      };
+       |
+       |      const scheduleSave = () => {
+       |        if (conflict) return;
+       |        if (debounceTimer) clearTimeout(debounceTimer);
+       |        setStatus("Dirty");
+       |        debounceTimer = setTimeout(() => { void saveNow(false); }, 800);
+       |      };
+       |
+       |      textarea.addEventListener("input", scheduleSave);
+       |      textarea.addEventListener("blur", () => { void saveNow(true); });
+       |
+       |      document.addEventListener("visibilitychange", () => {
+       |        if (document.visibilityState === "hidden") void saveNow(true);
+       |      });
+       |
+       |      window.addEventListener("beforeunload", () => {
+       |        if (textarea.value === lastSavedContent || conflict) return;
+       |        const params = buildBody();
+       |        try {
+       |          navigator.sendBeacon("/" + noteId, params);
+       |        } catch (_) {}
+       |      });
+       |    })();
        |  </script>
        |</body>
        |</html>

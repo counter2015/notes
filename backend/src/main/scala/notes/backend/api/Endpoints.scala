@@ -22,6 +22,7 @@ import sttp.tapir.server.ServerEndpoint
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.util.UUID
+import scala.util.control.NonFatal
 
 object Endpoints:
   private val maxContentBytes = 200 * 1024
@@ -52,8 +53,12 @@ object Endpoints:
         case Left(message) =>
           Left(error(StatusCode.BadRequest, ApiErrorCode.InvalidId, message))
         case Right(noteId) =>
-          val snapshot = noteService.getOrEmpty(noteId)
-          Right(HtmlPageRenderer.notePage(snapshot))
+          try
+            val snapshot = noteService.getOrEmpty(noteId)
+            Right(HtmlPageRenderer.notePage(snapshot))
+          catch
+            case NonFatal(ex) =>
+              Left(error(StatusCode.InternalServerError, ApiErrorCode.InternalError, s"load failed: ${ex.getMessage}"))
     }
 
   val saveNoteEndpoint: PublicEndpoint[(String, SaveNoteForm), (StatusCode, ApiErrorEnvelope), SaveNoteResponse, Any] =
@@ -97,6 +102,8 @@ object Endpoints:
                   current = Some(ApiConflictCurrent(currentVersion))
                 )
               )
+            case Left(NoteSaveError.StorageFailure(message)) =>
+              Left(error(StatusCode.InternalServerError, ApiErrorCode.InternalError, message))
     }
 
   private def error(statusCode: StatusCode, code: ApiErrorCode, message: String): (StatusCode, ApiErrorEnvelope) =

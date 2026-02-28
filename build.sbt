@@ -46,9 +46,12 @@ lazy val backend = (project in file("backend"))
   .settings(
     name := "notes-backend",
     libraryDependencies ++=
-      ModuleDependencies.backendJvm.map { dep =>
+      ModuleDependencies.backendJvmScala.map { dep =>
         dep.organization %% dep.artifact % dep.version
-      } :+
+      } ++
+        ModuleDependencies.backendJvmJava.map { dep =>
+          dep.organization % dep.artifact % dep.version
+        } :+
         (Libraries.Logging.logbackClassic.organization % Libraries.Logging.logbackClassic.artifact % Libraries.Logging.logbackClassic.version) :+
         (Libraries.Testing.munit.organization %% Libraries.Testing.munit.artifact % Libraries.Testing.munit.version % Test)
   )

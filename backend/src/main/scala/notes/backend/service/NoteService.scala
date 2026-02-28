@@ -13,6 +13,7 @@ sealed trait NoteSaveError
 
 object NoteSaveError:
   final case class VersionConflict(currentVersion: Long) extends NoteSaveError
+  final case class StorageFailure(message: String) extends NoteSaveError
 
 final class InMemoryNoteService extends NoteService:
   private val notes = TrieMap.empty[String, NoteSnapshot]

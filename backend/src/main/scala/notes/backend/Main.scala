@@ -1,14 +1,14 @@
 package notes.backend
 
 import notes.backend.api.Endpoints
-import notes.backend.service.InMemoryNoteService
+import notes.backend.service.PostgresNoteService
 import notes.backend.service.RandomIdAllocator
 import sttp.tapir.server.netty.sync.NettySyncServer
 
 object Main:
   def main(args: Array[String]): Unit =
     val idAllocator = new RandomIdAllocator()
-    val noteService = new InMemoryNoteService()
+    val noteService = PostgresNoteService.fromEnv()
     val server = NettySyncServer()
       .port(8080)
       .host("0.0.0.0")

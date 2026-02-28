@@ -7,30 +7,20 @@ import pureconfig.error.ConfigReaderFailures
 final case class HttpConfig(
     host: String,
     port: Int
-)
-
-object HttpConfig:
-  given ConfigReader[HttpConfig] =
-    ConfigReader.forProduct2("host", "port")(HttpConfig.apply)
+) derives ConfigReader
 
 final case class DbConfig(
     url: String,
     user: String,
     password: String
-)
-
-object DbConfig:
-  given ConfigReader[DbConfig] =
-    ConfigReader.forProduct3("url", "user", "password")(DbConfig.apply)
+) derives ConfigReader
 
 final case class NotesConfig(
     http: HttpConfig,
     db: DbConfig
-)
+) derives ConfigReader
 
 object NotesConfig:
-  given ConfigReader[NotesConfig] =
-    ConfigReader.forProduct2("http", "db")(NotesConfig.apply)
 
   def load(): Either[ConfigReaderFailures, NotesConfig] =
     ConfigSource.default.at("notes").load[NotesConfig]

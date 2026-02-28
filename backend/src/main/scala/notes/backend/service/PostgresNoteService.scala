@@ -1,5 +1,6 @@
 package notes.backend.service
 
+import notes.backend.config.DbConfig
 import notes.shared.NoteId
 import notes.shared.NoteSnapshot
 
@@ -109,8 +110,5 @@ final class PostgresNoteService(
     finally connection.close()
 
 object PostgresNoteService:
-  def fromEnv(): PostgresNoteService =
-    val jdbcUrl = sys.env.getOrElse("NOTES_DB_URL", "jdbc:postgresql://127.0.0.1:5432/notes")
-    val dbUser = sys.env.getOrElse("NOTES_DB_USER", "notes")
-    val dbPassword = sys.env.getOrElse("NOTES_DB_PASSWORD", "notes")
-    new PostgresNoteService(jdbcUrl, dbUser, dbPassword)
+  def fromConfig(dbConfig: DbConfig): PostgresNoteService =
+    new PostgresNoteService(dbConfig.url, dbConfig.user, dbConfig.password)

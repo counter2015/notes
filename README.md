@@ -18,11 +18,18 @@ sbt frontend/fastLinkJS
 
 ## PostgreSQL 初始化（幂等）
 
-后端默认数据库配置：
+后端默认配置位于 [application.conf](backend/src/main/resources/application.conf)，可通过环境变量覆盖。
+
+数据库相关默认项：
 
 - `NOTES_DB_URL=jdbc:postgresql://127.0.0.1:5432/notes`
 - `NOTES_DB_USER=notes`
 - `NOTES_DB_PASSWORD=notes`
+
+HTTP 相关默认项：
+
+- `NOTES_HTTP_HOST=0.0.0.0`
+- `NOTES_HTTP_PORT=8080`
 
 先用管理员账户初始化（可重复执行）：
 

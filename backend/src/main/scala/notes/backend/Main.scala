@@ -14,5 +14,6 @@ object Main:
       .host("0.0.0.0")
       .addEndpoint(Endpoints.allocateNote(idAllocator))
       .addEndpoint(Endpoints.getNotePage(noteService))
+      .addEndpoint(Endpoints.saveNote(noteService))
     println("[backend] starting server on http://0.0.0.0:8080")
     server.startAndWait()

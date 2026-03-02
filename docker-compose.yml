@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: notes-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-notes}
+      POSTGRES_USER: ${POSTGRES_USER:-notes}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-notes}
+    ports:
+      - "${POSTGRES_PORT:-5442}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/docker-init/01-notes-schema.sql:/docker-entrypoint-initdb.d/01-notes-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-notes} -d ${POSTGRES_DB:-notes}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    image: ${NOTES_BACKEND_IMAGE:-notes-backend:0.1.0-SNAPSHOT}
+    container_name: notes-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NOTES_HTTP_HOST: 0.0.0.0
+      NOTES_HTTP_PORT: 8080
+      NOTES_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-notes}
+      NOTES_DB_USER: ${POSTGRES_USER:-notes}
+      NOTES_DB_PASSWORD: ${POSTGRES_PASSWORD:-notes}
+    ports:
+      - "${NOTES_HTTP_PORT:-8080}:8080"
+
+volumes:
+  postgres-data:

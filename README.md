@@ -61,3 +61,31 @@ chmod +x ./scripts/init-postgres.sh
 - 存在 `notes` 角色，并设置登录密码
 - 存在 `notes` 数据库，并设置 owner
 - 存在 `notes` 表结构并授予最小读写权限
+
+## Docker Compose 本地启动
+
+前提：你已经在本地构建好后端镜像（默认镜像名 `notes-backend:local`）。
+
+启动：
+
+```bash
+docker compose up -d
+```
+
+查看日志：
+
+```bash
+docker compose logs -f backend
+```
+
+停止并清理：
+
+```bash
+docker compose down
+```
+
+如需覆盖镜像名：
+
+```bash
+NOTES_BACKEND_IMAGE=your-image:tag docker compose up -d
+```

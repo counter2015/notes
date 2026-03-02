@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS notes (
+  id         CHAR(4) PRIMARY KEY,
+  content    TEXT NOT NULL DEFAULT '',
+  version    BIGINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

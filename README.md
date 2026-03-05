@@ -28,6 +28,25 @@ sbt backend/Universal/packageBin
 
 - `backend/target/universal/notes-backend-0.1.0-SNAPSHOT.zip`
 
+Docker 镜像（本地）：
+
+```bash
+sbt backend/docker:publishLocal
+```
+
+Docker 镜像（指定 tag）：
+
+```bash
+IMAGE_TAG=$(git rev-parse HEAD) sbt backend/docker:publishLocal
+```
+
+## GitHub Actions 镜像发布（GHCR）
+
+- 工作流文件：`.github/workflows/docker-image.yml`
+- 触发条件：push 到 `master`（或手动触发）
+- 发布地址：`ghcr.io/<owner>/notes:<commit-hash>`
+- tag 规则：使用当前 commit hash（`${{ github.sha }}`）
+
 ## PostgreSQL 初始化（幂等）
 
 后端默认配置位于 [application.conf](backend/src/main/resources/application.conf)，可通过环境变量覆盖。

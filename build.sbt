@@ -3,6 +3,9 @@ import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbtcrossproject.CrossProject
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
+import com.typesafe.sbt.packager.docker.DockerPlugin
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.*
+import com.typesafe.sbt.packager.docker.DockerAlias
 
 ThisBuild / scalaVersion := Versions.scala3
 ThisBuild / version := "0.1.0-SNAPSHOT"
@@ -43,11 +46,20 @@ lazy val sharedJVM = shared.jvm
 lazy val sharedJS = shared.js
 
 lazy val backend = (project in file("backend"))
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAppPackaging, DockerPlugin)
   .dependsOn(sharedJVM)
   .settings(
     name := "notes-backend",
     Compile / mainClass := Some("notes.backend.Main"),
+    Docker / packageName := "notes",
+    dockerBaseImage := "eclipse-temurin:21-jre",
+    dockerExposedPorts := Seq(8080),
+    Docker / dockerAlias := DockerAlias(
+      registryHost = Some("ghcr.io"),
+      username = Some(sys.env.getOrElse("IMAGE_OWNER", "counter2015").toLowerCase),
+      name = "notes",
+      tag = Some(sys.env.getOrElse("IMAGE_TAG", version.value))
+    ),
     libraryDependencies ++=
       ModuleDependencies.backendJvmScala.map { dep =>
         dep.organization %% dep.artifact % dep.version

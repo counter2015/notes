@@ -54,11 +54,13 @@ lazy val backend = (project in file("backend"))
     Docker / packageName := "notes",
     dockerBaseImage := "eclipse-temurin:21-jre",
     dockerExposedPorts := Seq(8080),
-    Docker / dockerAlias := DockerAlias(
-      registryHost = Some("ghcr.io"),
-      username = Some(sys.env.getOrElse("IMAGE_OWNER", "counter2015").toLowerCase),
-      name = "notes",
-      tag = Some(sys.env.getOrElse("IMAGE_TAG", version.value))
+    Docker / dockerAliases := Seq(
+      DockerAlias(
+        registryHost = Some("ghcr.io"),
+        username = Some(sys.env.getOrElse("IMAGE_OWNER", "counter2015").toLowerCase),
+        name = "notes",
+        tag = Some(sys.env.getOrElse("IMAGE_TAG", version.value))
+      )
     ),
     libraryDependencies ++=
       ModuleDependencies.backendJvmScala.map { dep =>
